@@ -1,0 +1,16 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{6E0FADAB-4071-EE46-7133-888DAADFFD36}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "ServerTest",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		}
+	]
+}
