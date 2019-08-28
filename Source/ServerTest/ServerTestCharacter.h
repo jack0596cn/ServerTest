@@ -6,7 +6,15 @@
 #include "GameFramework/Character.h"
 #include "Engine/StaticMeshActor.h"
 #include "HMDStaticMeshActor.h"
+#include "IPAddress.h"
+#include "ReceiveProcess.h"
+#include "UnrealNetwork.h"
+#include "Sockets.h"
+#include "SocketSubsystem.h"
+#include "Interfaces/IPv4/IPv4Address.h"
 #include "ServerTestCharacter.generated.h"
+
+class FSocket;
 
 UCLASS(config=Game)
 class AServerTestCharacter : public ACharacter
@@ -24,6 +32,8 @@ class AServerTestCharacter : public ACharacter
 public:
 	AServerTestCharacter();
 
+	void InitializeInputBindings();
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -34,8 +44,45 @@ public:
 public:
 	
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds);
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UPROPERTY()
 	AHMDStaticMeshActor* SMActor;
+	
+	UPROPERTY(/*Replicated*/)
+	UStaticMeshComponent* MoveMeshTestCom;
+
+	FSocket* Socket;
+
+public:
+	void OnGPress();
+	void OnHPress();
+	void OnJPress();
+
+	UFUNCTION(NetMulticast, reliable, WithValidation)
+	void JumpOnServer();
+
+	UFUNCTION(Server, reliable, WithValidation)
+	void OutServerCMD();
+	
+	UFUNCTION(Server, reliable, WithValidation)
+	void LinkOuterServer();
+
+	UFUNCTION(Server, reliable,WithValidation)
+	void Mount();
+
+	UFUNCTION(Server, reliable, WithValidation)
+	void Demount();
+
+	UFUNCTION(NetMulticast, unreliable, WithValidation)
+	void Demount_MulticastRPCFunction();
+
+	UFUNCTION(NetMulticast, unreliable, WithValidation)
+	void Mount_MulticastRPCFunction();
+
+	UFUNCTION(Server, reliable, WithValidation)
+	void ListenOut();
 
 protected:
 
@@ -76,5 +123,11 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+private:
+	//UPROPERTY()
+	//AHMDStaticMeshActor * SMAPtr;
+
+	//UPROPERTY()
+	//AReceiveProcess* RP;
 };
 

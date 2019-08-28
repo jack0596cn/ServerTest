@@ -10,13 +10,27 @@ AHMDStaticMeshActor::AHMDStaticMeshActor()
 
 	SMCom = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HMDMeshCom"));
 	SMCom->SetupAttachment(RootComponent);
+	//SMCom->SetMobility(EComponentMobility::Movable);
 
 	TRCCom = CreateDefaultSubobject<UTextRenderComponent>(TEXT("TextRenderCom"));
 	TRCCom->SetupAttachment(RootComponent);
+	//TRCCom->SetIsReplicated(true);
 
 	SetMobility(EComponentMobility::Movable);
 	//every frame tick
 	PrimaryActorTick.bCanEverTick = true;
+
+	bNetLoadOnClient = true;
+
+	SetReplicates(true);
+
+	TRCCom->SetText(FText::FromString(TEXT("")));
+
+}
+
+void AHMDStaticMeshActor::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 }
 
 void AHMDStaticMeshActor::BeginPlay()
@@ -28,19 +42,15 @@ void AHMDStaticMeshActor::BeginPlay()
 		SMCom->SetStaticMesh(SM);
 	}
 
-	if (TRCCom)
+	bool hasAuthority = HasAuthority();
+	if (hasAuthority)
 	{
-		TRCCom->SetText(FText::FromString(TEXT("Default")));
-	}
-
-	if (Role == ROLE_Authority)
-	{
-		FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AHMDStaticMeshActor::OneSecTick);
-		GetWorldTimerManager().SetTimer(OneSecTimerHandle, TimerDelegate, 1.0f, true);	
+		//FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AHMDStaticMeshActor::OneSecTick);
+		GetWorldTimerManager().SetTimer(OneSecTimerHandle, this, &AHMDStaticMeshActor::OneSecTick, 1.0f, true);
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("BeginPlay"));
-	
+
 	Super::BeginPlay();
 }
 
@@ -48,31 +58,27 @@ void AHMDStaticMeshActor::OneSecTick()
 {
 	if (CountDownTimer > 0)
 	{
-		CountDownTimer -= 1;
+		CountDownTimer = CountDownTimer - 1;
 	}
 	else
 	{
 		UE_LOG(LogTemp, Log, TEXT("OneSecTick"));
 	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::FromInt(CountDownTimer));
 	
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::FromInt(Role));
+
+	TRCCom->SetText(FText::FromString(FString::FromInt(CountDownTimer)));
 }
 
 void AHMDStaticMeshActor::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
-	//Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	//DOREPLIFETIME(AHMDStaticMeshActor, CountDownTimer);
+	DOREPLIFETIME_CONDITION(AHMDStaticMeshActor, CountDownTimer, COND_OwnerOnly)
 }
 
 void AHMDStaticMeshActor::Tick(float DeltaSeconds)
 {
-	if (TRCCom)
-	{
-		TRCCom->SetText(FText::FromString(FString::FromInt(CountDownTimer)));
-	}
-
 	Super::Tick(DeltaSeconds);
 }
 

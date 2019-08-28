@@ -2,6 +2,7 @@
 
 #include "ServerTestGameMode.h"
 #include "ServerTestCharacter.h"
+#include "MyPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
 
 AServerTestGameMode::AServerTestGameMode()
@@ -11,5 +12,6 @@ AServerTestGameMode::AServerTestGameMode()
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
+		PlayerControllerClass = AMyPlayerController::StaticClass();
 	}
 }
