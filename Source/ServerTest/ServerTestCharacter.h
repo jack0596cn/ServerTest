@@ -84,6 +84,10 @@ public:
 	UFUNCTION(Server, reliable, WithValidation)
 	void ListenOut();
 
+	// cmd in console
+	UFUNCTION(Exec)
+	void MyPrint();
+
 protected:
 
 	/** Resets HMD orientation in VR. */

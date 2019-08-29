@@ -9,5 +9,6 @@ public class ServerTestEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 		ExtraModuleNames.Add("ServerTest");
+		ExtraModuleNames.Add("SecondModule");
 	}
 }

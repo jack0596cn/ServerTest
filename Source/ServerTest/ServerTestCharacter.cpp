@@ -13,6 +13,8 @@
 #include "ReceiveProcess.h"
 #include "MyGameInstance.h"
 
+#define LOCTEXT_NAMESPACE "ServerTest"
+
 //#define SMBP
 
 //////////////////////////////////////////////////////////////////////////
@@ -444,3 +446,10 @@ void AServerTestCharacter::MoveRight(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
+
+void AServerTestCharacter::MyPrint()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Exec CMD"));
+}
+
+#undef LOCTEXT_NAMESPACE

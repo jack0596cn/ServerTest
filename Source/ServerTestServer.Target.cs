@@ -9,5 +9,6 @@ public class ServerTestServerTarget : TargetRules
 	{
 		Type = TargetType.Server;
 		ExtraModuleNames.Add("ServerTest");
+		ExtraModuleNames.Add("SecondModule");
 	}
 }
