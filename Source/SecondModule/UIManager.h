@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(config = Game)
 class SECONDMODULE_API UUIManager : public UObject
 {
 	GENERATED_BODY()
@@ -24,10 +24,19 @@ public:
 		return Singleton;
 	}
 
+	void GrantItems();
+
+	void GrantItemsDeferred();
+
 protected:
 	UUIManager();
 	virtual ~UUIManager();
 
 private:
 	static UUIManager* Singleton;
+
+	TArray<FAssetData> AssetsToLoadList;
+
+	UPROPERTY(Config)
+	TArray<FSoftObjectPath> TestAssets;
 };

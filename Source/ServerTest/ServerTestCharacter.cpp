@@ -12,6 +12,7 @@
 #include "GameFramework/PlayerInput.h"
 #include "ReceiveProcess.h"
 #include "MyGameInstance.h"
+#include "UIManager.h"
 
 #define LOCTEXT_NAMESPACE "ServerTest"
 
@@ -102,6 +103,8 @@ void AServerTestCharacter::BeginPlay()
 	ListenOut();
 
 	LinkOuterServer();
+
+	UUIManager::GetInstance()->GrantItems();
 
 	Super::BeginPlay();
 }
