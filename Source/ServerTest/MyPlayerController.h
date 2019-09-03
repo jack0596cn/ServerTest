@@ -15,6 +15,10 @@ class SERVERTEST_API AMyPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
+	AMyPlayerController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
 	virtual void PlayerTick(float DeltaTime);
-	
+
+	virtual void BeginPlay() override;
+
 };

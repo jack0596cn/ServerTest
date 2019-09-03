@@ -125,7 +125,8 @@ void AServerTestCharacter::Tick(float DeltaSeconds)
 
 		if (Temp == TEXT("AAA_Resp"))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("ÌøÁË"));
+			UE_LOG(LogTemp, Log, TEXT("recv server jump cmd success!!"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Jump Go!!"));
 			JumpOnServer();
 		}
 	}

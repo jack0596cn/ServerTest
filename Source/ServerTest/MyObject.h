@@ -9,7 +9,7 @@
 
 
 USTRUCT()
-struct FTest
+struct SERVERTEST_API FTest
 {
 public:
 	GENERATED_USTRUCT_BODY()
@@ -45,8 +45,8 @@ public:
 	FString Test;
 
 	UPROPERTY(EditAnywhere)
-	AStaticMeshActor* SM;
+	TSubclassOf<AStaticMeshActor> SM;
 
 	UPROPERTY(EditAnywhere)
-	FTest fs;
+	FTest TT;
 };

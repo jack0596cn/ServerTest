@@ -45,7 +45,6 @@ void AHMDStaticMeshActor::BeginPlay()
 	bool hasAuthority = HasAuthority();
 	if (hasAuthority)
 	{
-		//FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AHMDStaticMeshActor::OneSecTick);
 		GetWorldTimerManager().SetTimer(OneSecTimerHandle, this, &AHMDStaticMeshActor::OneSecTick, 1.0f, true);
 	}
 

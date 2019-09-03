@@ -17,6 +17,11 @@ UUIManager::~UUIManager()
 	{
 		Singleton->RemoveFromRoot();
 	}
+
+	if (MyUserWidget)
+	{
+		MyUserWidget->RemoveFromRoot();
+	}
 }
 
 void UUIManager::GrantItems()

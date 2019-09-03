@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "MyUserWidget.h"
+#include "SMyCompoundWidget.h"
 #include "UIManager.generated.h"
 
 /**
@@ -28,6 +30,19 @@ public:
 
 	void GrantItemsDeferred();
 
+	TSharedRef<SWidget> GetMyWidget()
+	{
+		TSharedPtr<SWidget> MyWidgetPtr;
+		if (!MyWidgetPtr.IsValid())
+		{
+			MyUserWidget = NewObject<UMyUserWidget>();
+			MyUserWidget->AddToRoot();
+			MyWidgetPtr = MyUserWidget->RebuildWidget();
+		}
+
+		return MyWidgetPtr.ToSharedRef();
+	}
+
 protected:
 	UUIManager();
 	virtual ~UUIManager();
@@ -39,4 +54,7 @@ private:
 
 	UPROPERTY(Config)
 	TArray<FSoftObjectPath> TestAssets;
+
+	UPROPERTY()
+	UMyUserWidget* MyUserWidget;
 };

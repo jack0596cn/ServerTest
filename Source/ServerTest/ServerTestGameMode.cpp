@@ -3,6 +3,8 @@
 #include "ServerTestGameMode.h"
 #include "ServerTestCharacter.h"
 #include "MyPlayerController.h"
+#include "MyHUD.h"
+#include "MyGameState.h"
 #include "UObject/ConstructorHelpers.h"
 
 AServerTestGameMode::AServerTestGameMode()
@@ -13,5 +15,7 @@ AServerTestGameMode::AServerTestGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 		PlayerControllerClass = AMyPlayerController::StaticClass();
+		HUDClass = AMyHUD::StaticClass();
+		//GameStateClass = AMyGameState::StaticClass();
 	}
 }
