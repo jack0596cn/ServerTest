@@ -7,7 +7,6 @@
 #include "Engine/StaticMeshActor.h"
 #include "HMDStaticMeshActor.h"
 #include "IPAddress.h"
-#include "ReceiveProcess.h"
 #include "UnrealNetwork.h"
 #include "Sockets.h"
 #include "SocketSubsystem.h"
@@ -81,9 +80,6 @@ public:
 	UFUNCTION(NetMulticast, unreliable, WithValidation)
 	void Mount_MulticastRPCFunction();
 
-	UFUNCTION(Server, reliable, WithValidation)
-	void ListenOut();
-
 	// cmd in console
 	UFUNCTION(Exec)
 	void MyPrint();
@@ -127,11 +123,5 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-private:
-	//UPROPERTY()
-	//AHMDStaticMeshActor * SMAPtr;
-
-	//UPROPERTY()
-	//AReceiveProcess* RP;
 };
 

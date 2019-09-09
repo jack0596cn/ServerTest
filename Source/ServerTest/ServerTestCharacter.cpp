@@ -10,21 +10,24 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "HMDStaticMeshActor.h"
 #include "GameFramework/PlayerInput.h"
-#include "ReceiveProcess.h"
 #include "MyGameInstance.h"
 #include "UIManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "TcpClient.h"
 
 #define LOCTEXT_NAMESPACE "ServerTest"
 
-//#define SMBP
+#define LOCAL_IPADDR TEXT("127.0.0.1")
+#define LOCAL_PORT 8888
+
+#define IPADDR TEXT("172.16.23.61")
+#define PORT 32359
 
 //////////////////////////////////////////////////////////////////////////
 // AServerTestCharacter
 
 AServerTestCharacter::AServerTestCharacter()
 {
-	Socket = nullptr;
-
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -61,36 +64,24 @@ AServerTestCharacter::AServerTestCharacter()
 	MoveMeshTestCom->SetMobility(EComponentMobility::Movable);
 	MoveMeshTestCom->SetIsReplicated(true);
 
-	//MoveMeshTestCom->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-	//MoveMeshTestCom->RegisterComponent();
-	//MoveMeshTestCom->SetRelativeLocation(FVector(10, 0, 90));
 }
 
 void AServerTestCharacter::BeginPlay()
 {
-#ifdef SMBP
-	// 	FString SuffixStr = TEXT("_C");
-// 	FString BPPath = TEXT("/Game/BP/SM_Mesh_ProgramUse.SM_Mesh_ProgramUse") + SuffixStr;
-// 	TSubclassOf<AHMDStaticMeshActor> SMA = LoadClass<AHMDStaticMeshActor>(nullptr, *BPPath, nullptr);
-//	
-// 	if (SMA)
-// 	{
-// 		SMActor = GetWorld()->SpawnActor<AHMDStaticMeshActor>(SMA, FVector(-420.000000, 410.000000, 220.000000), FRotator(0, 180, 0));
-// 		if (SMActor)
-// 		{
-// 			SMActor->SetMobility(EComponentMobility::Movable);
-// 		}
-// 		
-// 		UE_LOG(LogTemp, Log, TEXT("BeginPlay"));
-// 	}
-#else
-// 	SMAPtr = GetWorld()->SpawnActor<AHMDStaticMeshActor>(AHMDStaticMeshActor::StaticClass(), \
-// 		FVector(-420.000000, 410.000000, 220.000000), FRotator(0, 180, 0));
-// 
-// 	if (SMAPtr)
-// 	{
-// 		UE_LOG(LogTemp, Log, TEXT("BeginPlay"));
-// 	}
+	FString SuffixStr = TEXT("_C");
+	FString BPPath = TEXT("/Game/BP/SM_Mesh_ProgramUse.SM_Mesh_ProgramUse")/* + SuffixStr*/;
+	TSubclassOf<AHMDStaticMeshActor> SMA = LoadClass<AHMDStaticMeshActor>(NULL, *BPPath, NULL, LOAD_None, NULL);
+	
+	if (SMA)
+	{
+		SMActor = GetWorld()->SpawnActor<AHMDStaticMeshActor>(SMA, FVector(-420.000000, 410.000000, 220.000000), FRotator(0, 180, 0));
+		if (SMActor)
+		{
+			SMActor->SetMobility(EComponentMobility::Movable);
+		}
+		
+		UE_LOG(LogTemp, Log, TEXT("Program Mesh"));
+	}
 
 	UStaticMesh* SM = LoadObject<UStaticMesh>(nullptr,TEXT("/Game/Mesh/GenericHMD.GenericHMD"), nullptr, LOAD_None, nullptr);
 	if (SM)
@@ -98,39 +89,18 @@ void AServerTestCharacter::BeginPlay()
 		MoveMeshTestCom->SetStaticMesh(SM);
 	}
 
-#endif // SMBP
+	ATcpClient* tcpActor = GetWorld()->SpawnActor<ATcpClient>(ATcpClient::StaticClass(),FVector(-0, 0, 0), FRotator(0, 0, 0));
+	if (tcpActor){
+		tcpActor->SetActorHiddenInGame(true);
+	}
 
-	ListenOut();
-
-	LinkOuterServer();
-
-	UUIManager::GetInstance()->GrantItems();
+	//UUIManager::GetInstance()->GrantItems();
 
 	Super::BeginPlay();
 }
 
 void AServerTestCharacter::Tick(float DeltaSeconds)
 {
-	uint8 Buffer[2 * 1024] = { 0 };
-	int32 DataLen = 0;
-	if (Socket && Socket->Recv(Buffer, sizeof(Buffer) - 1, DataLen, ESocketReceiveFlags::None))
-	{
-		FUTF8ToTCHAR WideBuffer(reinterpret_cast<const ANSICHAR*>(Buffer));
-		TCHAR* RecStr = (TCHAR*)WideBuffer.Get();
-		
-		FString Temp = RecStr;
-
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, *Temp);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::FromInt(Role));
-
-		if (Temp == TEXT("AAA_Resp"))
-		{
-			UE_LOG(LogTemp, Log, TEXT("recv server jump cmd success!!"));
-			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Jump Go!!"));
-			JumpOnServer();
-		}
-	}
-
 	Super::Tick(DeltaSeconds);
 }
 
@@ -206,50 +176,8 @@ bool AServerTestCharacter::OutServerCMD_Validate()
 void AServerTestCharacter::OutServerCMD_Implementation()
 {
 	if (HasAuthority())
-	{
-		Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
-
-		FString address = TEXT("127.0.0.1");
-		int32 port = 8888;
-		FIPv4Address ip;
-		FIPv4Address::Parse(address, ip);
-
-		TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-		addr->SetIp(ip.Value);
-		addr->SetPort(port);
-
-		bool connected = Socket->Connect(*addr);
-		if (connected)
-		{
-			FString serialized = TEXT("AAA");
-			TCHAR *serializedChar = serialized.GetCharArray().GetData();
-			int32 size = FCString::Strlen(serializedChar);
-			int32 sent = 0;
-
-			if (Socket != nullptr)
-			{
-				bool successful = Socket->Send((uint8*)TCHAR_TO_UTF8(serializedChar), size, sent);
-				if (successful)
-				{
-					UE_LOG(LogTemp, Log, TEXT("send %s success!!"), *serialized);
-				}
-			}
-		}
-		/*
-		FString serialized = TEXT("AAA");
-		TCHAR *serializedChar = serialized.GetCharArray().GetData();
-		int32 size = FCString::Strlen(serializedChar);
-		int32 sent = 0;
-
-		UMyGameInstance* myGI = Cast<UMyGameInstance>(GetGameInstance());
-		FSocket *Socket = myGI->GetSocket();
-
-		bool successful = Socket->Send((uint8*)TCHAR_TO_UTF8(serializedChar), size, sent);
-		if (successful)
-		{
-			UE_LOG(LogTemp, Log, TEXT("send %s success!!"), *serialized);
-		}
-		*/
+	{	
+		//
 	}
 }
 
@@ -281,18 +209,6 @@ bool AServerTestCharacter::Demount_Validate()
 void AServerTestCharacter::Demount_Implementation()
 {
 	Demount_MulticastRPCFunction();
-}
-
-bool AServerTestCharacter::ListenOut_Validate()
-{
-	return true;
-}
-
-void AServerTestCharacter::ListenOut_Implementation()
-{
-	FVector Location(-420.000000, 410.000000, 220.000000);
-	AReceiveProcess* RP = GetWorld()->SpawnActor<AReceiveProcess>(AReceiveProcess::StaticClass(), \
-		Location, FRotator(0, 180, 0));
 }
 
 void AServerTestCharacter::Mount_MulticastRPCFunction_Implementation()
@@ -344,46 +260,7 @@ void AServerTestCharacter::LinkOuterServer_Implementation()
 {
 	if (Role == ROLE_Authority) 
 	{
-		Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
-		
-		FString address = TEXT("127.0.0.1");
-		int32 port = 8888;
-		FIPv4Address ip;
-		FIPv4Address::Parse(address, ip);
-
-		TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-		addr->SetIp(ip.Value);
-		addr->SetPort(port);
-
-		bool connected = Socket->Connect(*addr);
-		if (connected)
-		{
-			FString serialized = TEXT("loadPlayer|1");
-			TCHAR *serializedChar = serialized.GetCharArray().GetData();
-			int32 size = FCString::Strlen(serializedChar);
-			int32 sent = 0;
-
-			bool successful = Socket->Send((uint8*)TCHAR_TO_UTF8(serializedChar), size, sent);
-			if (successful)
-			{
-				UE_LOG(LogTemp, Log, TEXT("send success!!"));
-			}
-		}
-		/*
-		FString serialized = TEXT("loadPlayer|1");
-		TCHAR *serializedChar = serialized.GetCharArray().GetData();
-		int32 size = FCString::Strlen(serializedChar);
-		int32 sent = 0;
-
-		//FSocket *Socket = UMyGameInstance::GetSocket();
-		UMyGameInstance* myGI = Cast<UMyGameInstance>(GetGameInstance());
-		FSocket *Socket = myGI->GetSocket();
-		bool successful = Socket->Send((uint8*)TCHAR_TO_UTF8(serializedChar), size, sent);
-		if (successful)
-		{
-			UE_LOG(LogTemp, Log, TEXT("send success!!"));
-		}
-		*/
+		//
 	}
 }
 

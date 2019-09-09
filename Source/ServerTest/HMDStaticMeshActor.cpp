@@ -10,11 +10,9 @@ AHMDStaticMeshActor::AHMDStaticMeshActor()
 
 	SMCom = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HMDMeshCom"));
 	SMCom->SetupAttachment(RootComponent);
-	//SMCom->SetMobility(EComponentMobility::Movable);
 
 	TRCCom = CreateDefaultSubobject<UTextRenderComponent>(TEXT("TextRenderCom"));
 	TRCCom->SetupAttachment(RootComponent);
-	//TRCCom->SetIsReplicated(true);
 
 	SetMobility(EComponentMobility::Movable);
 	//every frame tick
@@ -64,8 +62,6 @@ void AHMDStaticMeshActor::OneSecTick()
 		UE_LOG(LogTemp, Log, TEXT("OneSecTick"));
 	}
 	
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::FromInt(Role));
-
 	TRCCom->SetText(FText::FromString(FString::FromInt(CountDownTimer)));
 }
 

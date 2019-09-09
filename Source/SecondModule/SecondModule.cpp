@@ -3,7 +3,7 @@
 #include "SecondModule.h"
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_GAME_MODULE(FSecondeModule, "SecondModule" );
+IMPLEMENT_GAME_MODULE(FSecondeModule, SecondModule);
 
 
 #define LOCTEXT_NAMESPACE "SecondModule"

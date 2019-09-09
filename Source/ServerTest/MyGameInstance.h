@@ -21,12 +21,6 @@ class SERVERTEST_API UMyGameInstance : public UGameInstance
 public:
 	UMyGameInstance(const FObjectInitializer& ObjectInitializer);
 
-	FSocket* GetSocket()
-	{
-		return Socket;
-	}
-
-private:
-	FSocket* Socket;
+	virtual void Init();
 	
 };

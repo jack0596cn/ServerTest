@@ -38,7 +38,8 @@ UCLASS()
 class SERVERTEST_API AMyObject : public AActor
 {
 	GENERATED_BODY()
-	
+
+
 public:
 
 	UPROPERTY(EditAnywhere)
@@ -49,4 +50,5 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FTest TT;
+
 };
