@@ -29,6 +29,10 @@ void AMyPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
+	if (OnTestBroadCast.IsBound())
+	{
+		OnTestBroadCast.Broadcast();
+	}
 }
 
 void AMyPlayerController::RecvProcess(FString& Msg)
@@ -57,13 +61,6 @@ void AMyPlayerController::RecvProcess(FString& Msg)
 			}
 		}
 	}
-}
-
-
-
-void AMyPlayerController::Talk()
-{
-
 }
 
 APawn* AMyPlayerController::FindNPC_BP()

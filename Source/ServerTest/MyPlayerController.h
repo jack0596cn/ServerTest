@@ -7,6 +7,9 @@
 #include "Engine/StaticMeshActor.h"
 #include "MyPlayerController.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTestBroadCast);
+
 /**
  * 
  */
@@ -54,7 +57,6 @@ public:
 		return DialogString;
 	}
 
-	void Talk();
 	void Run();
 	AStaticMeshActor* FindSmallTree();
 	APawn* FindNPC_BP();
@@ -65,4 +67,7 @@ public:
 	bool bCanRun;
 	bool bTalk;
 	FString DialogString;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnTestBroadCast OnTestBroadCast;
 };

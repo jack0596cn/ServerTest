@@ -74,6 +74,7 @@ void AHMDStaticMeshActor::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 void AHMDStaticMeshActor::Tick(float DeltaSeconds)
 {
+	//Talk();
 	Super::Tick(DeltaSeconds);
 }
 

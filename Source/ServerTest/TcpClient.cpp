@@ -11,7 +11,7 @@ ATcpClient::ATcpClient()
 	bReplicates = true;
 	Tcp_UpdateRate = 0.1f;
 
-	this->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	//this->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	
 }
 

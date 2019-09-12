@@ -68,20 +68,16 @@ AServerTestCharacter::AServerTestCharacter()
 
 void AServerTestCharacter::BeginPlay()
 {
-	FString SuffixStr = TEXT("_C");
-	FString BPPath = TEXT("/Game/BP/SM_Mesh_ProgramUse.SM_Mesh_ProgramUse")/* + SuffixStr*/;
-	TSubclassOf<AHMDStaticMeshActor> SMA = LoadClass<AHMDStaticMeshActor>(NULL, *BPPath, NULL, LOAD_None, NULL);
-	
-	if (SMA)
+	AStaticMeshActor* TempActor = GetWorld()->SpawnActor<AStaticMeshActor>(AHMDStaticMeshActor::StaticClass(), \
+		FVector(-420.000000, 410.000000, 220.000000), FRotator(0, 180, 0));
+
+	SMActor = Cast<AHMDStaticMeshActor>(TempActor);
+	if (SMActor != nullptr)
 	{
-		SMActor = GetWorld()->SpawnActor<AHMDStaticMeshActor>(SMA, FVector(-420.000000, 410.000000, 220.000000), FRotator(0, 180, 0));
-		if (SMActor)
-		{
-			SMActor->SetMobility(EComponentMobility::Movable);
-		}
-		
-		UE_LOG(LogTemp, Log, TEXT("Program Mesh"));
+		SMActor->SetMobility(EComponentMobility::Movable);
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("Program Mesh"));
 
 	UStaticMesh* SM = LoadObject<UStaticMesh>(nullptr,TEXT("/Game/Mesh/GenericHMD.GenericHMD"), nullptr, LOAD_None, nullptr);
 	if (SM)

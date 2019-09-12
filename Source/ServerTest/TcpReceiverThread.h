@@ -57,7 +57,7 @@ public:
 				m_Client->Recv(ReceiveData.GetData(), ReceiveData.Num(), read, ESocketReceiveFlags::None);
 				UE_LOG(LogTemp, Warning, TEXT("Data Bytes Read : %s Byte."), *FString::FromInt(read));
 
-				FString ReceivedUE4String = /*"Data : " + */FString(ANSI_TO_TCHAR(reinterpret_cast<const char*>(ReceiveData.GetData()))); // byte to char
+				FString ReceivedUE4String = FString(ANSI_TO_TCHAR(reinterpret_cast<const char*>(ReceiveData.GetData()))); // byte to char
 				UE_LOG(LogTemp, Warning, TEXT("%s"), *ReceivedUE4String);
 
 				if (MyController)

@@ -30,6 +30,9 @@ public:
 		return SMCom;
 	}
 
+	//UFUNCTION(BlueprintImplementableEvent, Category = "ServerTest")
+	//void Talk();
+
 private:
 	UPROPERTY()
 	AStaticMeshActor* SMActor;

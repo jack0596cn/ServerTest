@@ -16,12 +16,10 @@ public:
 
 	FTest()
 	{
-
 	}
 
 	virtual ~FTest()
 	{
-
 	}
 
 	UPROPERTY(EditAnywhere, Category = Instances)
@@ -39,6 +37,9 @@ class SERVERTEST_API AMyObject : public AActor
 {
 	GENERATED_BODY()
 
+public:
+	AMyObject();
+	virtual void Tick(float DeltaSeconds);
 
 public:
 
@@ -50,5 +51,20 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FTest TT;
+	//C++ -> BP
+	UFUNCTION(BlueprintNativeEvent, Category = "ServerTest")
+	void OnShowDebugInfo();
+	void OnShowDebugInfo_Implementation();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "ServerTest")
+	void CallBPLogic();
+
+	//BP -> C++
+	UFUNCTION(BlueprintCallable, Category = "ServerTest")
+	FString GetDefaultStr()
+	{
+		return DefaultString;
+	}
+private:
+	FString DefaultString;
 };
